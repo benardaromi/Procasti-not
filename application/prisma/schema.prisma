@@ -12,3 +12,76 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        String    @id
+  email     String    @unique
+  name      String?
+  createdAt DateTime  @default(now())
+  tasks     Task[] // One-to-many relation: a user can have many tasks
+  timeLogs  TimeLog[] // Track time spent by the user on tasks
+
+  @@map("users") // Optional, but renaming the table to "users" can avoid conflicts
+}
+
+model Task {
+  id           Int       @id @default(autoincrement())
+  name         String
+  description  String?
+  dueDate      DateTime?
+  priority     Priority // 1: High, 2: Medium, 3: Low
+  status       Status // Enum (Pending, In Progress, Completed)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  parentTask   Task?     @relation("Subtasks", fields: [parentTaskId], references: [id]) // Self-relation for subtasks
+  parentTaskId Int?
+  subtasks     Task[]    @relation("Subtasks")
+  tags         Tag[]     @relation("TaskTags") // Many-to-many relation with Tag
+  taskTags     TaskTag[]
+  timeLogs     TimeLog[] // Relation to capture task activity logs
+  user         User      @relation(fields: [userId], references: [id]) // Relation to User model
+  userId       String
+
+  // For analytics: e.g., aggregate time spent, number of subtasks, etc.
+}
+
+model Tag {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  tasks    Task[]    @relation("TaskTags") // Many-to-many relation with Task
+  taskTags TaskTag[]
+}
+
+model TaskTag {
+  taskId Int
+  tagId  Int
+
+  task Task @relation(fields: [taskId], references: [id])
+  tag  Tag  @relation(fields: [tagId], references: [id])
+
+  @@id([taskId, tagId]) // Composite key to ensure uniqueness of task-tag pair
+}
+
+model TimeLog {
+  id        Int       @id @default(autoincrement())
+  task      Task      @relation(fields: [taskId], references: [id])
+  taskId    Int
+  user      User      @relation(fields: [userId], references: [id]) // User who worked on the task
+  userId    String
+  startedAt DateTime
+  endedAt   DateTime?
+
+  @@index([taskId, startedAt]) // For quicker lookups by task and time
+}
+
+enum Status {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
