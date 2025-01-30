@@ -9,8 +9,9 @@ import { useState } from 'react'
 import { createTask } from '@/lib/actions'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import SubmitButton from './submitButton'
+import { TaskFormProps } from '@/lib/types'
 
-export default function NewTaskForm() {
+export default function NewTaskForm({ tags } : TaskFormProps) {
     const [date, setDate] = useState<Date>()
     const handleDate = (date: Date | undefined ) => {
         setDate(date)
@@ -23,7 +24,10 @@ export default function NewTaskForm() {
                 <Label>Name</Label>
                 <Input type='text' name='name' required/>
             </div>
-            <Textarea placeholder='describe the task'/>
+            <div>
+                <Label>Description</Label>
+                <Textarea name='description'/>
+            </div>
             <div className='flex justify-between'>
                 <div>
                     <Label>Due date</Label>
@@ -44,7 +48,23 @@ export default function NewTaskForm() {
                         </SelectContent>
                     </Select>
                 </div>
+                
             </div>
+            <div className='w-full'>
+                <Label>Tags</Label>
+                <Select name='tag'>
+                    <SelectTrigger>
+                        <SelectValue placeholder='choose'></SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            {tags.map((tag) => (
+                                <SelectItem key={tag.id} value={tag.name}>{tag.name}</SelectItem>
+                            ))}
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+                </div>
             <SubmitButton text='Create'/>
         </Form>
     )

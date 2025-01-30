@@ -1,9 +1,5 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -30,7 +26,7 @@ model Task {
   description  String?
   dueDate      DateTime?
   priority     Priority // 1: High, 2: Medium, 3: Low
-  status       Status // Enum (Pending, In Progress, Completed)
+  status       Status 
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   parentTask   Task?     @relation("Subtasks", fields: [parentTaskId], references: [id]) // Self-relation for subtasks
@@ -41,8 +37,6 @@ model Task {
   timeLogs     TimeLog[] // Relation to capture task activity logs
   user         User      @relation(fields: [userId], references: [id]) // Relation to User model
   userId       String
-
-  // For analytics: e.g., aggregate time spent, number of subtasks, etc.
 }
 
 model Tag {
