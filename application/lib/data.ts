@@ -8,3 +8,10 @@ export async function getTags() {
     })
     return tags
 }
+
+export async function getTasks(){
+    const tasks = await db.task.findMany({
+        orderBy: { dueDate: 'asc'}
+    })
+    return tasks
+}

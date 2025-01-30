@@ -4,6 +4,7 @@ import { z } from "zod"
 import { auth, currentUser } from "@clerk/nextjs/server"
 import { db } from "@/database"
 import { Priority } from "./types"
+import { revalidatePath } from "next/cache"
 
 const taskFormSchema = z.object({
     name: z.string(),
@@ -54,4 +55,6 @@ export async function createTask(dueDate: Date, formData:FormData) {
             status: 'PENDING',
         }
     })
+
+    revalidatePath('/')
 }
