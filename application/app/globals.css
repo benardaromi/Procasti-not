@@ -70,3 +70,16 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.animate-fade-out {
+  animation: fade-out 0.5s ease-out 2s forwards;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

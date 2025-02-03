@@ -26,7 +26,8 @@ model Task {
   description  String?
   dueDate      DateTime?
   priority     Priority // 1: High, 2: Medium, 3: Low
-  status       Status 
+  status       Status
+  startedAt    DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   parentTask   Task?     @relation("Subtasks", fields: [parentTaskId], references: [id]) // Self-relation for subtasks

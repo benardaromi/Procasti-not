@@ -1,5 +1,5 @@
 import NewTaskForm from "@/components/newTaskForm";
-import { Button } from "@/components/ui/button";
+import StartTask from "@/components/startTask";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
@@ -7,7 +7,7 @@ import { getTags, getTasks } from "@/lib/data";
 import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { differenceInDays } from "date-fns";
-import { AlarmClockCheck, ClipboardCheck, Pencil, Play } from "lucide-react";
+import { AlarmClockCheck, ClipboardCheck, Pencil} from "lucide-react";
 
 export default async function Home() {
   const [user, tags, tasks] = await Promise.all([
@@ -75,13 +75,17 @@ export default async function Home() {
                   'bg-blue-500'}
                 `}
               >
-                <CardHeader></CardHeader>
+                <CardHeader>
+                  <CardDescription className="text-white">
+                    hello
+                  </CardDescription>
+                </CardHeader>
                 <CardContent className="flex flex-col space-y-2">
                   <CardTitle className="text-gray-800">{task.name}</CardTitle>
                   <div>
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Pencil />
+                        <Pencil className="size-4 cursor-pointer hover:scale-105 transition text-white/75 hover:text-white"/>
                       </DialogTrigger>
                       <DialogContent className="w-[380px]">
                         <DialogHeader>
@@ -91,9 +95,7 @@ export default async function Home() {
                           Mark to-do as started or completed 
                         </DialogDescription>
                         <div className="flex justify-around">
-                          <span className="flex items-center space-x-2 bg-blue-500 p-2 px-3 rounded shadow hover:shadow-lg cursor-pointer transition text-white/65 hover:text-white hover:opacity-95">
-                            <h2 className="flex mx-auto items-center">Start task <Play className="size-5 ml-2"/></h2>
-                          </span>
+                          <StartTask taskId={task.id} />
                           <span className="flex items-center space-x-2 bg-blue-500 p-2 px-3 rounded shadow hover:shadow-lg cursor-pointer transition text-white/65 hover:text-white hover:opacity-95">
                             <h2 className="flex mx-auto items-center">Complete task <ClipboardCheck className="size-5 ml-2"/></h2>
                           </span>
