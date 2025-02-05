@@ -26,13 +26,19 @@ export type FormButtonProps = {
     onSuccessEnd?: () => void
 }
 
+export type TaskActionProps = {
+    
+}
+
 export type FormStatus = {
     type: 'success' | 'error' | null
     message: string | null
 }
 
-export type StartTaskState = {
+export interface StartTaskState  {
     success?: boolean
     error?: string
     timeLogId?: number
 }
+
+export interface DeleteTaskState extends StartTaskState {}

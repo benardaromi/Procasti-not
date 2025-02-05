@@ -40,7 +40,7 @@ export default function FormButton({
 
             {formState?.success && (
                 <div
-                    className="absolute top-full mt-2 mb-2 text-sm text-green-500 animate-fade-out"
+                    className="absolute top-full mt-1 text-sm text-green-500 animate-fade-out"
                     role="alert"
                 >
                     {successMessage}

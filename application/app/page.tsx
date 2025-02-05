@@ -1,13 +1,17 @@
+import BeginTask from "@/components/beginTask";
 import NewTaskForm from "@/components/newTaskForm";
 import StartTask from "@/components/startTask";
+import TaskActions from "@/components/taskActions";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { getTags, getTasks } from "@/lib/data";
 import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
-import { differenceInDays } from "date-fns";
-import { AlarmClockCheck, ClipboardCheck, Pencil} from "lucide-react";
+import { differenceInDays, formatDistanceToNowStrict } from "date-fns";
+import { AlarmClockCheck, ClipboardCheck, Pencil, Trash2} from "lucide-react";
 
 export default async function Home() {
   const [user, tags, tasks] = await Promise.all([
@@ -44,7 +48,7 @@ export default async function Home() {
           <div className=" space-x-2 font-semibold text-gray-600 flex items-center">
             <h1>To-dos</h1> 
             <span className="h-1 w-1 rounded-full bg-blue-500"></span>
-            <span>{tasks.length}</span>
+            <span>{tasks!.length}</span>
           </div>
           <div className="flex space-x-2 items-center">
             <h2 className="text-center">Priority </h2>
@@ -60,8 +64,8 @@ export default async function Home() {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
-          {tasks.map((task) => {
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {tasks!.map((task) => {
             const now = new Date()
             const dueDate = task.dueDate ? new Date(task.dueDate) : null
             const daysLeft = dueDate ? differenceInDays(dueDate, now) : null
@@ -76,32 +80,15 @@ export default async function Home() {
                 `}
               >
                 <CardHeader>
-                  <CardDescription className="text-white">
-                    hello
+                  <CardDescription className="flex items-center text-white text-xs justify-between">
+                    {task.startedAt ? `Started ${formatDistanceToNowStrict(task.startedAt)} ago` : `Queued`}
+                    <TaskActions taskID={task.id} />
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-col space-y-2">
                   <CardTitle className="text-gray-800">{task.name}</CardTitle>
-                  <div>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Pencil className="size-4 cursor-pointer hover:scale-105 transition text-white/75 hover:text-white"/>
-                      </DialogTrigger>
-                      <DialogContent className="w-[380px]">
-                        <DialogHeader>
-                          <DialogTitle>Edit To-do</DialogTitle>
-                        </DialogHeader>
-                        <DialogDescription>
-                          Mark to-do as started or completed 
-                        </DialogDescription>
-                        <div className="flex justify-around">
-                          <StartTask taskId={task.id} />
-                          <span className="flex items-center space-x-2 bg-blue-500 p-2 px-3 rounded shadow hover:shadow-lg cursor-pointer transition text-white/65 hover:text-white hover:opacity-95">
-                            <h2 className="flex mx-auto items-center">Complete task <ClipboardCheck className="size-5 ml-2"/></h2>
-                          </span>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
+                  <div className="flex space-x-3">
+                    <BeginTask taskID={task.id} />
                   </div>
                 </CardContent>
                 <CardFooter>
