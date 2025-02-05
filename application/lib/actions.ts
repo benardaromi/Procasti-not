@@ -5,14 +5,13 @@ import { auth, currentUser } from "@clerk/nextjs/server"
 import { db } from "@/database"
 import { DeleteTaskState, Priority, StartTaskState } from "./types"
 import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
 import { Status } from "@prisma/client"
 
 const taskFormSchema = z.object({
     name: z.string(),
     description: z.string().optional(),
     priority: z.string(),
-    tag: z.string()
+    dueDate: z.string()
 })
 
 const startTaskFormSchema = z.object({
@@ -49,6 +48,7 @@ export async function deleteTask(prevState: DeleteTaskState, formData: FormData)
         return { success: true }
 
     } catch (error) {
+        // console.log('Failed to delete task:', error)  
         return {
             error: 'Internal server error',
             success: false
@@ -56,53 +56,77 @@ export async function deleteTask(prevState: DeleteTaskState, formData: FormData)
     }
 }
 
-export async function createTask(dueDate: Date, formData:FormData) {
-    const validatedTaskSchema = taskFormSchema.safeParse({
-        name: formData.get('name'),
-        description: formData.get('description'),
-        priority: formData.get('priority'),
-        tag: formData.get('tag')
-    })
-
-    const { userId } = await auth()
-    if(!validatedTaskSchema.success || !userId) return
-    
-    const { name, description, priority, tag } = validatedTaskSchema.data
-
-    const [ userDetails, userExists ] = await Promise.all([
-        currentUser(),
-        db.user.findUnique({
-            where: { id: userId }
+export async function createTask(prevState: StartTaskState, formData: FormData) : Promise<StartTaskState> {
+    try {
+        const validatedTaskSchema = taskFormSchema.safeParse({
+            name: formData.get('name'),
+            description: formData.get('description'),
+            priority: formData.get('priority'),
+            dueDate: formData.get('dueDate')
         })
-    ])
+        
+        if(!validatedTaskSchema.success) return {
+            error: validatedTaskSchema.error.errors.map(e => e.message).join(', '),
+            success: false
+        }
 
-    if(!userDetails) return
-    
-    if (!userExists) {
-        await db.user.create({
+        console.log()
+
+        const { userId } = await auth()
+        if (!userId) return { 
+            error: 'User not authenticated', 
+            success: false 
+        }
+
+        const { name, description, priority, dueDate } = validatedTaskSchema.data
+
+        const [ userDetails, userExists ] = await Promise.all([
+            currentUser(),
+            db.user.findUnique({
+                where: { id: userId }
+            })
+        ])
+
+        if(!userDetails) return {
+            error: 'User not found',
+            success: false
+        }
+
+        if (!userExists) {
+            await db.user.create({
+                data: {
+                    id: userId,
+                    name: userDetails.firstName,
+                    email: userDetails.primaryEmailAddress?.emailAddress ?? 'no email'             
+                }
+            })
+        }
+
+        await db.task.create({
             data: {
-                id: userId,
-                name: userDetails.firstName,
-                email: userDetails.primaryEmailAddress?.emailAddress ?? 'no email'
+                name: name,
+                description: description ?? null,
+                dueDate: new Date(dueDate) ?? null,
+                priority: priority as Priority,
+                userId: userId,
+                status: 'PENDING',
+                startedAt: null,
+                completedAt: null,
             }
         })
-    }
 
-    await db.task.create({
-        data: {
-            name: name,
-            description: description ?? null,
-            dueDate: dueDate ? new Date(dueDate) : null,
-            priority: priority as Priority,
-            userId: userId,
-            status: 'PENDING',
-            startedAt: null
+        revalidatePath('/')
+        return { success: true }
+
+    } catch (error) {
+        console.error('Failed to start task:', error)
+        return {
+            error: 'Internal server error',
+            success: false
         }
-    })
-
-    revalidatePath('/')
-    redirect('/')
+    }
 }
+
 
 export async function endTask(prevState: StartTaskState, formData: FormData) : Promise<StartTaskState> {
     try {

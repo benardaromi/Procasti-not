@@ -28,9 +28,11 @@ model Task {
   priority     Priority // 1: High, 2: Medium, 3: Low
   status       Status
   startedAt    DateTime?
+  completedAt  DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-  parentTask   Task?     @relation("Subtasks", fields: [parentTaskId], references: [id]) // Self-relation for subtasks
+  
+  parentTask   Task?     @relation("Subtasks", fields: [parentTaskId], references: [id], onDelete: Cascade) // Self-relation for subtasks
   parentTaskId Int?
   subtasks     Task[]    @relation("Subtasks")
   tags         Tag[]     @relation("TaskTags") // Many-to-many relation with Tag
@@ -51,15 +53,15 @@ model TaskTag {
   taskId Int
   tagId  Int
 
-  task Task @relation(fields: [taskId], references: [id])
-  tag  Tag  @relation(fields: [tagId], references: [id])
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([taskId, tagId]) // Composite key to ensure uniqueness of task-tag pair
 }
 
 model TimeLog {
   id        Int       @id @default(autoincrement())
-  task      Task      @relation(fields: [taskId], references: [id])
+  task      Task      @relation(fields: [taskId], references: [id], onDelete: Cascade ) 
   taskId    Int
   user      User      @relation(fields: [userId], references: [id]) // User who worked on the task
   userId    String

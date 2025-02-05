@@ -10,7 +10,7 @@ import { Input } from "./ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { endTask } from "@/lib/actions";
 
-export default function BeginTask({ taskID }: {taskID:number}) {
+export default function CompleteTask({ taskID }: {taskID:number}) {
     const [formState, formAction, isPending] = useActionState(endTask, {
         error: undefined,
         success: false,

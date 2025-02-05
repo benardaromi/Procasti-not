@@ -1,22 +1,15 @@
 import BeginTask from "@/components/beginTask";
-import NewTaskForm from "@/components/newTaskForm";
-import StartTask from "@/components/startTask";
+import { NewTask } from "@/components/newTaskForm";
 import TaskActions from "@/components/taskActions";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { getTags, getTasks } from "@/lib/data";
+import { getTasks } from "@/lib/data";
 import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { differenceInDays, formatDistanceToNowStrict } from "date-fns";
-import { AlarmClockCheck, ClipboardCheck, Pencil, Trash2} from "lucide-react";
 
 export default async function Home() {
-  const [user, tags, tasks] = await Promise.all([
+  const [user, tasks] = await Promise.all([
     currentUser(),
-    getTags(),
     getTasks()
   ])
 
@@ -27,20 +20,7 @@ export default async function Home() {
         <UserButton />
       </div>
       <div className="p-2 flex ">
-        <Drawer>
-          <DrawerTrigger asChild>
-            <div className="p-3 px-4 bg-mild border border-mild flex items-center space-x-1 shadow-md rounded cursor-pointer">
-              <p>New Task</p>
-              <AlarmClockCheck/>
-            </div>
-          </DrawerTrigger>
-          <DrawerContent>
-            <DrawerHeader>
-              <DrawerTitle>Create</DrawerTitle>
-            </DrawerHeader>
-            <NewTaskForm tags={tags} />
-          </DrawerContent>
-        </Drawer>
+        <NewTask />
       </div>
       <div className="h-[0.10rem] bg-slate-200 shadow"></div>
       <div className="flex flex-col space-y-3">
