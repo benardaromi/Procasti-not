@@ -3,7 +3,7 @@
 import { Tooltip } from "@radix-ui/react-tooltip";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 import { TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
-import { Play } from "lucide-react";
+import { CircleCheck } from "lucide-react";
 import { useActionState, useEffect, useState } from "react";
 import Form from "next/form";
 import { Input } from "./ui/input";
@@ -46,7 +46,7 @@ export default function CompleteTask({ taskID }: {taskID:number}) {
                 <TooltipProvider>
                     <Tooltip>
                     <TooltipTrigger asChild>
-                        <Play className="size-6 hover:cursor-pointer text-gray-300 hover:text-white transition"/> 
+                        <CircleCheck className="size-6 hover:cursor-pointer text-gray-300 hover:text-white transition"/> 
                     </TooltipTrigger>
                     <TooltipContent>
                         <p>complete task</p>

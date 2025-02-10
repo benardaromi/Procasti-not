@@ -1,16 +1,18 @@
 import BeginTask from "@/components/beginTask";
+import CompleteTask from "@/components/completeTask";
 import { NewTask } from "@/components/newTaskForm";
 import TaskActions from "@/components/taskActions";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { getTasks } from "@/lib/data";
+import { getCompletedTaskCount, getTasks } from "@/lib/data";
 import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { differenceInDays, formatDistanceToNowStrict } from "date-fns";
 
 export default async function Home() {
-  const [user, tasks] = await Promise.all([
+  const [user, tasks, completedTaskCount ] = await Promise.all([
     currentUser(),
-    getTasks()
+    getTasks(),
+    getCompletedTaskCount()
   ])
 
   return (
@@ -19,8 +21,13 @@ export default async function Home() {
         <p>Jambo <span className="bg-gradient-to-r font-semibold bg-clip-text from-blue-600 to-gray-600 text-transparent drop-shadow">{user?.firstName ?? ''}</span></p>
         <UserButton />
       </div>
-      <div className="p-2 flex ">
+      <div className="p-2 flex space-x-2 items-center">
         <NewTask />
+        <Card className="p-2 flex items-center space-x-2">
+          <CardTitle className="text-gray-800">Completed Tasks</CardTitle>
+          <span className="h-1 w-1 rounded-full bg-blue-500"></span>
+          <CardTitle className="text-gray-800">{completedTaskCount}</CardTitle>
+        </Card>
       </div>
       <div className="h-[0.10rem] bg-slate-200 shadow"></div>
       <div className="flex flex-col space-y-3">
@@ -69,6 +76,7 @@ export default async function Home() {
                   <CardTitle className="text-gray-800">{task.name}</CardTitle>
                   <div className="flex space-x-3">
                     <BeginTask taskID={task.id} />
+                    <CompleteTask taskID={task.id} />
                   </div>
                 </CardContent>
                 <CardFooter>

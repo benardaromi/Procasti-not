@@ -26,7 +26,7 @@ const deleteTaskFormSchema = z.object({
     taskID: z.coerce.number().min(1)
 })
 
-export async function deleteTask(prevState: DeleteTaskState, formData: FormData) 
+export async function deleteTask(currentState: DeleteTaskState, formData: FormData) 
     : Promise<DeleteTaskState> {
     try {
         const parsedTaskId = deleteTaskFormSchema.safeParse({
@@ -45,7 +45,8 @@ export async function deleteTask(prevState: DeleteTaskState, formData: FormData)
         })
 
         revalidatePath('/')
-        return { success: true }
+        console.log(currentState)
+        return  { success: true }
 
     } catch (error) {
         // console.log('Failed to delete task:', error)  
@@ -183,12 +184,12 @@ export async function endTask(prevState: StartTaskState, formData: FormData) : P
             where: { id: taskId },
             data: { 
                 status: Status.COMPLETED,
-                updatedAt: new Date()
+                updatedAt: new Date(),
+                completedAt: new Date()
             }
         })
 
         revalidatePath('/')
-        
         return {
             success: true,
         }

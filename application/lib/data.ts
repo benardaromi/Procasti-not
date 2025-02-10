@@ -12,10 +12,13 @@ export async function getTags() {
 
 export async function getTasks(){
     const { userId}  = await auth()
-    if(!userId) return
 
+    if(!userId) return
     const tasks = await db.task.findMany({
-        where: { userId: userId },
+        where: { 
+            userId: userId,
+            completedAt: null 
+        },
         orderBy: { dueDate: 'asc'}
     })
     return tasks
@@ -23,11 +26,26 @@ export async function getTasks(){
 
 export async function getCompletedTasks(){
     const { userId } = await auth()
+    
     if(!userId) return
-
     const tasks = await db.task.findMany({
         where: { userId: userId, },
         orderBy: { dueDate: 'asc'}
     })
     return tasks
+}
+
+export async function getCompletedTaskCount() {
+    const { userId } = await auth()
+    if(!userId) return
+
+    const count = await db.task.count({
+        where: { userId: userId, completedAt: { not: null } }
+    })
+    return count
+}
+
+export async function getHeatMapData() {
+    const { userId } = await auth()
+    if(!userId) return
 }
