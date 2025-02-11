@@ -45,7 +45,6 @@ export async function deleteTask(currentState: DeleteTaskState, formData: FormDa
         })
 
         revalidatePath('/')
-        console.log(currentState)
         return  { success: true }
 
     } catch (error) {
@@ -180,6 +179,15 @@ export async function endTask(prevState: StartTaskState, formData: FormData) : P
             data: { endedAt: new Date() }
         })
 
+        await db.timeLog.create({
+            data: {
+                userId: userId,
+                updatedAt: new Date(),
+                taskId: task.id,
+                startedAt: timeLog.startedAt
+            }
+        })
+
         await db.task.update({
             where: { id: taskId },
             data: { 
@@ -245,7 +253,8 @@ export async function startTaskAction(
             data: {
                 startedAt: new Date(),
                 taskId: taskId,
-                userId: userId
+                userId: userId,
+                updatedAt: new Date()
             }
         })
 

@@ -67,6 +67,7 @@ model TimeLog {
   userId    String
   startedAt DateTime
   endedAt   DateTime?
+  updatedAt DateTime @updatedAt
 
   @@index([taskId, startedAt]) // For quicker lookups by task and time
 }

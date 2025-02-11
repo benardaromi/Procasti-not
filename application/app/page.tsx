@@ -1,5 +1,6 @@
 import BeginTask from "@/components/beginTask";
 import CompleteTask from "@/components/completeTask";
+import { HeatMap } from "@/components/heatMap";
 import { NewTask } from "@/components/newTaskForm";
 import TaskActions from "@/components/taskActions";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +17,7 @@ export default async function Home() {
   ])
 
   return (
-    <div className="flex flex-col p-4 w-dvw md:max-w-4xl mx-auto bg-slate-50 space-y-3">
+    <div className="flex flex-col p-4 w-dvw md:max-w-4xl mx-auto bg-slate-50 space-y-6">
       <div className="flex p-2 px-3 justify-between items-center">
         <p>Jambo <span className="bg-gradient-to-r font-semibold bg-clip-text from-blue-600 to-gray-600 text-transparent drop-shadow">{user?.firstName ?? ''}</span></p>
         <UserButton />
@@ -93,7 +94,12 @@ export default async function Home() {
           })}
         </div>
       </div>
-      <div className="h-[0.10rem] bg-slate-200 shadow"></div>
+      <div className="flex min-w-full items-center space-x-3"> 
+        <div className="h-[0.10rem] bg-gray-400 w-full "></div>
+          <h1 className="font-semibold text-xs">Activity</h1>
+        <span className="bg-gray-400 w-full h-[0.10rem]" ></span>
+      </div>
+      <HeatMap />
     </div>
   );
 }

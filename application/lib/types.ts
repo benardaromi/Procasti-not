@@ -26,6 +26,10 @@ export type FormButtonProps = {
     onSuccessEnd?: () => void
 }
 
+export interface DailyCounts {
+    [date: string]: number 
+}
+
 export type TaskActionProps = {
     
 }
