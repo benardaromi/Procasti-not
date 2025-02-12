@@ -3,6 +3,7 @@
 import { db } from "@/database"
 import { auth } from "@clerk/nextjs/server"
 import { DailyCounts } from "./types"
+import { differenceInHours } from "date-fns"
 
 export async function getTags() {
     const tags = await db.tag.findMany({
@@ -34,6 +35,27 @@ export async function getCompletedTasks(){
         orderBy: { dueDate: 'asc'}
     })
     return tasks
+}
+
+export async function getAverageTimeSpentOnTasks() {
+    const { userId } = await auth()
+    if(!userId) return
+    let timeInHours = 0
+
+    const tasks = await db.task.findMany({
+        where: { userId: userId, status: 'COMPLETED' },
+        select: { startedAt: true, completedAt: true }
+    })
+
+    tasks.forEach((task) => {
+        if (task.completedAt && task.startedAt) {
+            const duration = differenceInHours(new Date(task.completedAt), new Date(task.startedAt))
+            timeInHours += duration
+        }
+    })
+
+    const averageTimeInHours = tasks.length ? timeInHours / tasks.length : 0
+    return averageTimeInHours
 }
 
 export async function getCompletedTaskCount() {

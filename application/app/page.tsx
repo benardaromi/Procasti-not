@@ -3,21 +3,23 @@ import CompleteTask from "@/components/completeTask";
 import { HeatMap } from "@/components/heatMap";
 import { NewTask } from "@/components/newTaskForm";
 import TaskActions from "@/components/taskActions";
+import { TimeSpent } from "@/components/timeSpent";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCompletedTaskCount, getTasks } from "@/lib/data";
+import { getAverageTimeSpentOnTasks, getCompletedTaskCount, getTasks } from "@/lib/data";
 import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { differenceInDays, formatDistanceToNowStrict } from "date-fns";
 
 export default async function Home() {
-  const [user, tasks, completedTaskCount ] = await Promise.all([
+  const [user, tasks, completedTaskCount, data ] = await Promise.all([
     currentUser(),
     getTasks(),
-    getCompletedTaskCount()
+    getCompletedTaskCount(),
+    getAverageTimeSpentOnTasks()
   ])
 
   return (
-    <div className="flex flex-col p-4 w-dvw md:max-w-4xl mx-auto bg-slate-50 space-y-6">
+    <div className="flex flex-col p-4 w-dvw md:max-w-4xl mx-auto  space-y-6">
       <div className="flex p-2 px-3 justify-between items-center">
         <p>Jambo <span className="bg-gradient-to-r font-semibold bg-clip-text from-blue-600 to-gray-600 text-transparent drop-shadow">{user?.firstName ?? ''}</span></p>
         <UserButton />
@@ -100,6 +102,9 @@ export default async function Home() {
         <span className="bg-gray-400 w-full h-[0.10rem]" ></span>
       </div>
       <HeatMap />
+      <div className="p-2 flex items-center">
+        <TimeSpent data={data ? data : 0 } />
+      </div>
     </div>
   );
 }

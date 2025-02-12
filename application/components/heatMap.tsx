@@ -25,7 +25,7 @@ export async function HeatMap() {
     daysGroupedByWeekday[dayOfWeek].push(count);
   });
 
-  const cellSize = "0.90rem"
+  const cellSize = "0.86rem"
 
   return (
     <div className="overflow-x-auto border border-gray-400 p-2 rounded-md">
