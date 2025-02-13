@@ -3,7 +3,7 @@
 import { db } from "@/database"
 import { auth } from "@clerk/nextjs/server"
 import { DailyCounts } from "./types"
-import { differenceInHours } from "date-fns"
+import { differenceInHours, endOfYear, format, getMonth, getYear, startOfDay } from "date-fns"
 
 export async function getTags() {
     const tags = await db.tag.findMany({
@@ -93,4 +93,73 @@ export async function getHeatMapData() {
 
 
     return dailyCounts
+}
+
+export async function getPastYearTasks(selectedYear: string)  {
+    const { userId } = await auth()
+    if ( !userId )  return
+
+    const firstDayOfYear = startOfDay(new Date(selectedYear))
+    const lasDayOfYear = endOfYear(firstDayOfYear)
+
+    const tasks = await db.task.findMany({
+        where: {
+            userId: userId,
+            status: 'COMPLETED',
+            completedAt: {
+                gte: firstDayOfYear,
+                lte: lasDayOfYear
+            }
+        },
+        select: { completedAt: true }
+    })
+
+    const monthTasksMap: {[month: string]: number} = {}
+
+    tasks.forEach((task) => {
+        if(task.completedAt) {
+            // Returns month index (0 for January, 1 for February,)
+            const monthIndex = getMonth(new Date(task.completedAt))
+            const monthName = format(new Date(task.completedAt), 'MMMM')
+
+            if(!monthTasksMap[monthName]) {
+                monthTasksMap[monthName] = 0
+            }
+
+            monthTasksMap[monthName] += 1
+        }
+    })
+
+    // Convert map to array of objects
+    const tasksByMonth = Object.keys(monthTasksMap).map((month) => ({
+        month,
+        totalTasks: monthTasksMap[month],
+    }))
+
+    return tasksByMonth
+}
+
+export async function  getYearOptions() {
+    const {userId } = await auth()
+    if (!userId) return
+
+    // earliest completed task
+    const oldestTask = await db.task.findFirst({
+        where: { userId: userId, status: 'COMPLETED' },
+        orderBy: { completedAt: 'asc'},
+        select: { completedAt: true }
+    })
+
+    if (!oldestTask || !oldestTask.completedAt) return []
+
+    const oldestYear = getYear(new Date(oldestTask.completedAt))
+    const currentYear = getYear(new Date())
+
+    // array of years oldest to current
+    const yearOptions = []
+    for (let year = oldestYear; year <= currentYear; year++) {
+        yearOptions.push(year.toString())
+    }
+
+    return yearOptions
 }

@@ -3,19 +3,26 @@ import CompleteTask from "@/components/completeTask";
 import { HeatMap } from "@/components/heatMap";
 import { NewTask } from "@/components/newTaskForm";
 import TaskActions from "@/components/taskActions";
+import { TaskBarChart } from "@/components/taskBarChart";
 import { TimeSpent } from "@/components/timeSpent";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { getAverageTimeSpentOnTasks, getCompletedTaskCount, getTasks } from "@/lib/data";
+import { getAverageTimeSpentOnTasks, getCompletedTaskCount, getTasks, getYearOptions } from "@/lib/data";
 import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { differenceInDays, formatDistanceToNowStrict } from "date-fns";
 
 export default async function Home() {
-  const [user, tasks, completedTaskCount, data ] = await Promise.all([
+  const [
+    user, tasks, 
+    completedTaskCount, 
+    data,
+    years 
+  ] = await Promise.all([
     currentUser(),
     getTasks(),
     getCompletedTaskCount(),
-    getAverageTimeSpentOnTasks()
+    getAverageTimeSpentOnTasks(),
+    getYearOptions()
   ])
 
   return (
@@ -102,8 +109,9 @@ export default async function Home() {
         <span className="bg-gray-400 w-full h-[0.10rem]" ></span>
       </div>
       <HeatMap />
-      <div className="p-2 flex items-center">
+      <div className="p-2 flex flex-col md:flex-row space-y-3 md:justify-evenly">
         <TimeSpent data={data ? data : 0 } />
+        <TaskBarChart years={years ? years : []}/>
       </div>
     </div>
   );

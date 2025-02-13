@@ -32,7 +32,7 @@ const chartConfig = {
 
 export function TimeSpent({data} : {data: number}) {
     const chartData = [
-        { browser: "safari", visitors: data, fill: "var(--color-safari)" },
+        { browser: "safari", visitors: data, fill: "#03A9F4" },
     ]
 
     return (
@@ -94,7 +94,7 @@ export function TimeSpent({data} : {data: number}) {
                 </RadialBarChart>
                 </ChartContainer>
             </CardContent>
-            <CardFooter className="flex-col gap-2 text-sm">
+            <CardFooter className="flex-col text-sm">
                 <div className="leading-none text-muted-foreground">
                 Showing average time spent on tasks
                 </div>
