@@ -1,12 +1,10 @@
 "use client"
 
-import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts"
 
 import {
     Card,
     CardContent,
-    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
@@ -50,9 +48,8 @@ export function TaskBarChart({years}: {years: string[]}) {
 
     return (
         <Card>
-        <CardHeader>
+        <CardHeader className="items-center flex flex-row">
             <CardTitle>Task Completion</CardTitle>
-            <CardDescription>January - June 2024</CardDescription>
             <Select value={activeYear} onValueChange={setActiveYear}>
                 <SelectTrigger
                     className="ml-auto h-7 w-[130px] rounded-lg pl-2.5"
@@ -117,9 +114,6 @@ export function TaskBarChart({years}: {years: string[]}) {
             </ChartContainer>
         </CardContent>
         <CardFooter className="flex-col items-start gap-2 text-sm">
-            <div className="flex gap-2 font-medium leading-none">
-            Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-            </div>
             <div className="leading-none text-muted-foreground">
             Showing total tasks completed for the past year
             </div>

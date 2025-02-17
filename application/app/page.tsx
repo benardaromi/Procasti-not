@@ -1,12 +1,13 @@
 import BeginTask from "@/components/beginTask";
 import CompleteTask from "@/components/completeTask";
 import { HeatMap } from "@/components/heatMap";
+import { HourlyActivity } from "@/components/hourlyActivity";
 import { NewTask } from "@/components/newTaskForm";
 import TaskActions from "@/components/taskActions";
 import { TaskBarChart } from "@/components/taskBarChart";
 import { TimeSpent } from "@/components/timeSpent";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { getAverageTimeSpentOnTasks, getCompletedTaskCount, getTasks, getYearOptions } from "@/lib/data";
+import { getAverageTimeSpentOnTasks, getCompletedTaskCount, getPeakProductivityHours, getTasks, getYearOptions } from "@/lib/data";
 import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { differenceInDays, formatDistanceToNowStrict } from "date-fns";
@@ -16,13 +17,15 @@ export default async function Home() {
     user, tasks, 
     completedTaskCount, 
     data,
-    years 
+    years,
+    hourlyActivities 
   ] = await Promise.all([
     currentUser(),
     getTasks(),
     getCompletedTaskCount(),
     getAverageTimeSpentOnTasks(),
-    getYearOptions()
+    getYearOptions(),
+    getPeakProductivityHours()
   ])
 
   return (
@@ -39,28 +42,13 @@ export default async function Home() {
           <CardTitle className="text-gray-800">{completedTaskCount}</CardTitle>
         </Card>
       </div>
-      <div className="h-[0.10rem] bg-slate-200 shadow"></div>
+      <div className="flex min-w-full items-center space-x-2"> 
+          <h1 className="font-semibold text-xs">Tasks</h1>
+          <div className="bg-blue-500 h-1 w-1 rounded-full drop-shadow-md"></div>
+          <p className="text-xs">{tasks?.length}</p>
+        <span className="bg-gray-400 w-full h-[0.10rem]" ></span>
+      </div>
       <div className="flex flex-col space-y-3">
-        <div className="flex items-center justify-between">
-          <div className=" space-x-2 font-semibold text-gray-600 flex items-center">
-            <h1>To-dos</h1> 
-            <span className="h-1 w-1 rounded-full bg-blue-500"></span>
-            <span>{tasks!.length}</span>
-          </div>
-          <div className="flex space-x-2 items-center">
-            <h2 className="text-center">Priority </h2>
-            <div className="bg-blue-500 h-1 w-1 rounded-full drop-shadow-md"></div>
-            <div className="flex items-center text-xs space-x-1">
-              <span>low</span>
-              <div className="h-2 w-20 rounded grid grid-cols-3">
-                <div className="bg-blue-500 rounded"></div>
-                <div className="bg-orange-500 rounded"></div>
-                <div className="bg-rose-500 rounded"></div>
-              </div>
-              <span>high</span>
-            </div>
-          </div>
-        </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {tasks!.map((task) => {
             const now = new Date()
@@ -112,6 +100,14 @@ export default async function Home() {
       <div className="p-2 flex flex-col md:flex-row space-y-3 md:justify-evenly">
         <TimeSpent data={data ? data : 0 } />
         <TaskBarChart years={years ? years : []}/>
+      </div>
+      <div className="flex min-w-full items-center space-x-3"> 
+        <div className="h-[0.10rem] bg-gray-400 w-full "></div>
+          <h1 className="font-semibold text-xs">Insights</h1>
+        <span className="bg-gray-400 w-full h-[0.10rem]" ></span>
+      </div>
+      <div className="p-2 flex flex-col md:flex-row space-y-3 md:justify-evenly">
+        <HourlyActivity data={hourlyActivities ?? []}/>
       </div>
     </div>
   );

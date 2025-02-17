@@ -38,7 +38,7 @@ export function TimeSpent({data} : {data: number}) {
     return (
         <Card className="flex flex-col">
             <CardHeader className="items-center pb-0">
-                <CardTitle>Time Spent</CardTitle>
+                <CardTitle>Average Time Spent</CardTitle>
             </CardHeader>
             <CardContent className="flex-1 pb-0">
                 <ChartContainer

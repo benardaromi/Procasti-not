@@ -4,6 +4,7 @@ import { db } from "@/database"
 import { auth } from "@clerk/nextjs/server"
 import { DailyCounts } from "./types"
 import { differenceInHours, endOfYear, format, getMonth, getYear, startOfDay } from "date-fns"
+import { object } from "zod"
 
 export async function getTags() {
     const tags = await db.tag.findMany({
@@ -162,4 +163,35 @@ export async function  getYearOptions() {
     }
 
     return yearOptions
+}
+
+export async function getPeakProductivityHours() {
+    const {userId } = await auth()
+    if (!userId) return
+
+    const timeLogs = await db.timeLog.findMany({
+        where: { userId: userId },
+        select: { startedAt: true }
+    })
+
+    const hourLabels = [
+        "12am", "1am", "2am", "3am", "4am", "5am", "6am", "7am", "8am", "9am", "10am", "11am",
+        "12pm", "1pm", "2pm", "3pm", "4pm", "5pm", "6pm", "7pm", "8pm", "9pm", "10pm", "11pm"
+    ]
+
+    // Group by hour
+    const hourlyActivity = hourLabels.map(label => ({ [label]: 0 }))
+
+    timeLogs.forEach(log => {
+        const hour = new Date(log.startedAt).getHours()
+        const label = hourLabels[hour]
+        hourlyActivity[hour][label]++
+    })
+    
+    const transformedData = hourlyActivity.map(entry => {
+        const [hour, tasks] = Object.entries(entry)[0]
+        return { hour, tasks }
+    })
+
+    return transformedData
 }
