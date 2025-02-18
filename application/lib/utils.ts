@@ -80,3 +80,59 @@ export function groupDatesByWeeks(dateGrid: Record<string, number>) {
 
   return weeks;
 }
+
+export function groupByTimeOfDay(hourlyActivity: { [hour: string]: number }[]) {
+  const groupedActivity = {
+      lateNight: 0,
+      morning: 0,
+      afternoon: 0,
+      evening: 0,
+      night: 0,
+  };
+
+  // Helper function to convert 12-hour format to 24-hour format
+  const convertTo24Hour = (hour: string) => {
+      const period = hour.slice(-2); // Get 'am' or 'pm'
+      let hourNum = parseInt(hour); // Convert hour to number
+
+      if (period === 'pm' && hourNum !== 12) {
+          hourNum += 12; // Convert pm to 24-hour time
+      } else if (period === 'am' && hourNum === 12) {
+          hourNum = 0; // Midnight case
+      }
+
+      return hourNum;
+  };
+
+  hourlyActivity.forEach((activity) => {
+      const [hourString] = Object.keys(activity);
+      const tasks = Object.values(activity)[0];
+
+      const hourNum = convertTo24Hour(hourString);
+
+      if (hourNum >= 0 && hourNum < 5) {
+          groupedActivity.lateNight += tasks;
+      } else if (hourNum >= 5 && hourNum < 12) {
+          groupedActivity.morning += tasks;
+      } else if (hourNum >= 12 && hourNum < 17) {
+          groupedActivity.afternoon += tasks;
+      } else if (hourNum >= 17 && hourNum < 21) {
+          groupedActivity.evening += tasks;
+      } else if (hourNum >= 21 && hourNum <= 23) {
+          groupedActivity.night += tasks;
+      }
+  });
+
+  return [
+      { timeOfDay: "Late Night", tasks: groupedActivity.lateNight },
+      { timeOfDay: "Morning", tasks: groupedActivity.morning },
+      { timeOfDay: "Afternoon", tasks: groupedActivity.afternoon },
+      { timeOfDay: "Evening", tasks: groupedActivity.evening },
+      { timeOfDay: "Night", tasks: groupedActivity.night },
+  ];
+}
+
+export function roundToDP(value: number, decimalPlaces: number): number {
+  const factor = Math.pow(10, decimalPlaces);
+  return Math.round(value * factor) / factor;
+}

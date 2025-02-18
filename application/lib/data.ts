@@ -171,7 +171,7 @@ export async function getPeakProductivityHours() {
 
     const timeLogs = await db.timeLog.findMany({
         where: { userId: userId },
-        select: { startedAt: true }
+        select: { updatedAt: true }
     })
 
     const hourLabels = [
@@ -183,15 +183,15 @@ export async function getPeakProductivityHours() {
     const hourlyActivity = hourLabels.map(label => ({ [label]: 0 }))
 
     timeLogs.forEach(log => {
-        const hour = new Date(log.startedAt).getHours()
+        const hour = new Date(log.updatedAt).getHours()
         const label = hourLabels[hour]
         hourlyActivity[hour][label]++
     })
     
-    const transformedData = hourlyActivity.map(entry => {
-        const [hour, tasks] = Object.entries(entry)[0]
-        return { hour, tasks }
-    })
+    // const transformedData = hourlyActivity.map(entry => {
+    //     const [hour, tasks] = Object.entries(entry)[0]
+    //     return { hour, tasks }
+    // })
 
-    return transformedData
+    return hourlyActivity
 }

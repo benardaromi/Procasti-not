@@ -16,7 +16,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-
+import { groupByTimeOfDay } from "@/lib/utils"
 
 
 const chartConfig = {
@@ -27,13 +27,16 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function HourlyActivity(
-{data} : {data: {hour: string; tasks: number }[]}) {
+{data} : {data: { hour: string; tasks: number }[]}) {
+  
+  const processsedData = groupByTimeOfDay(data)
+
   return (
     <Card>
       <CardHeader className="items-center pb-4">
         <CardTitle>Productivity Chart</CardTitle>
         <CardDescription>
-          Showing lifetime hourly productivity
+          Showing lifetime productivity
         </CardDescription>
       </CardHeader>
       <CardContent className="pb-0">
@@ -41,9 +44,9 @@ export function HourlyActivity(
           config={chartConfig}
           className="mx-auto aspect-square max-h-[250px]"
         >
-          <RadarChart data={data}>
+          <RadarChart data={processsedData}>
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <PolarAngleAxis dataKey="hour" />
+            <PolarAngleAxis dataKey="timeOfDay" />
             <PolarGrid />
             <Radar
               dataKey="tasks"

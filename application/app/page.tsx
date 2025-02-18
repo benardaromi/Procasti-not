@@ -1,16 +1,20 @@
 import BeginTask from "@/components/beginTask";
 import CompleteTask from "@/components/completeTask";
+import { CompletionRate } from "@/components/completionRate";
 import { HeatMap } from "@/components/heatMap";
 import { HourlyActivity } from "@/components/hourlyActivity";
 import { NewTask } from "@/components/newTaskForm";
+import { OverTimeTrendChart } from "@/components/overTimeLineChart";
 import TaskActions from "@/components/taskActions";
 import { TaskBarChart } from "@/components/taskBarChart";
 import { TimeSpent } from "@/components/timeSpent";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAverageTimeSpentOnTasks, getCompletedTaskCount, getPeakProductivityHours, getTasks, getYearOptions } from "@/lib/data";
+import { getOvertimeTrends } from "@/lib/data/getOvertimeTrends";
 import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { differenceInDays, formatDistanceToNowStrict } from "date-fns";
+import { ClipboardCheck } from "lucide-react";
 
 export default async function Home() {
   const [
@@ -18,14 +22,14 @@ export default async function Home() {
     completedTaskCount, 
     data,
     years,
-    hourlyActivities 
+    hourlyActivities, 
   ] = await Promise.all([
     currentUser(),
     getTasks(),
     getCompletedTaskCount(),
     getAverageTimeSpentOnTasks(),
     getYearOptions(),
-    getPeakProductivityHours()
+    getPeakProductivityHours(),
   ])
 
   return (
@@ -35,12 +39,18 @@ export default async function Home() {
         <UserButton />
       </div>
       <div className="p-2 flex space-x-2 items-center">
-        <NewTask />
-        <Card className="p-2 flex items-center space-x-2">
-          <CardTitle className="text-gray-800">Completed Tasks</CardTitle>
-          <span className="h-1 w-1 rounded-full bg-blue-500"></span>
-          <CardTitle className="text-gray-800">{completedTaskCount}</CardTitle>
-        </Card>
+        <div className="border border-gray-400 rounded flex flex-col">
+          <div className="px-1 border-b border-gray-400 w-full bg-slate-100 flex flex-col gap-1">
+            <div className="flex items-center  space-x-1 p-1.5">
+              <ClipboardCheck className="size-5"/>
+              <h2 className="font-semibold">Task Completion Rate</h2>
+            </div>
+          </div>
+          <div className="p-2">
+            <CompletionRate />
+          </div>
+
+        </div>
       </div>
       <div className="flex min-w-full items-center space-x-2"> 
           <h1 className="font-semibold text-xs">Tasks</h1>
